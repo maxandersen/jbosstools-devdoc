@@ -1,5 +1,8 @@
 DRAFT: This is a draft of how versioning are used in jboss tools projects - currently based on current "defacto" and orally agreed on versioning used in the related project(s)
 
+:toc: macro
+toc::[]
+
 ## General versioning rules
 
 JBoss projects in general follows the general naming at https://community.jboss.org/wiki/JBossProjectVersioning.
