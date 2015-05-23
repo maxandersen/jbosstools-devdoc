@@ -1,4 +1,8 @@
-= Configuring Git Workflow
+= How to use Git with JBoss Tools
+
+:toc:
+
+toc::[]
 
 == How to setup git locally
 
@@ -16,75 +20,35 @@ modifying your `~/.gitconfig` file to add the following:
         email = yourname@example.com
 ----
 
-==== Useful aliases for ~/.gitconfig
+=== Create a dir for storing your jbosstools projects
 
-Here are some aliases you can optionally add to your `~/.gitconfig` file, in the `[alias]` section. 
+JBoss Tools consists of many different repositories. We recommend you put all the repositories under one directory for simpler navigation.
 
-The first alias, `lg`, assists you in browsing the commit log. 
-After adding it to your .gitconfig file, try `git lg 5` to show the last 5 commits. 
+In this document we use `~/jbosstools` as the root location for the JBoss Tools repositories, but you can of course use your own favorite location.
 
-The second alias, `rb`, allows you to rebase the last `n` commits, modify commit messages, squash (combine) commits or re-order commits. 
-Try `git rb 3` to work with your last 3 commits. NOTE: This is an advanced concept and requires more knowledge of git to perform properly, but it is a handy shortcut once you know what you're doing. 
-
-[source,bash]
+[source, bash]
 ----
-[alias]
-  lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %C(blue)%aE%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
-  rb = "!sh -c 'git rebase -i HEAD~$1' -"
+mkdir ~/jbosstools
 ----
 
-You can also configure default diff and merge editors. In the example below, Sublime Text is selected as the diff/merge editor, and Beyond Compare is used for performing graphical comparisons, eg., with `git difftool` or `git mergetool`.
+=== Install Hub (optional)
 
-[source,bash]
-----
-[diff]
-  editor = /opt/sublimetext2/sublime_text
-  tool = bc3
-
-[merge]
-  editor = /opt/sublimetext2/sublime_text
-  tool = bc3
-----
-
-=== Useful bash scripts
-
-The following bash function will help you quickly identify when you are inside a folder
-that is recognized as a git repository.  It will customize your bash prompt to include 
-the repository name and the current branch. 
-
-[source,bash] 
-----
-# returns the branch name
-__git_ps1 ()
-{
-  local b="$(git symbolic-ref HEAD 2>/dev/null)";
-  if [ -n "$b" ]; then
-    printf " (%s)" "${b##refs/heads/}";
-  fi
-}
-export PS1='[\u@\h \W] $(__git_ps1 "(%s)")$'
-
-# this may also be required for your distro
-PROMPT_COMMAND=__git_ps1
-----
-
-Now when in a git folder, your bash prompt will look as follows:
-
-[source,bash] 
-----
-[user@localhost jbosstools-server]  (master) $
-----
+https://hub.github.com/[hub] is optional to install but severely reduces the amount of commands needed to work
+with github fork and pull-request model. In this doc we'll have a both "with hub" and "plain git" instructions,
+but as you'll see the `hub` commands are generally more concise and effective to use.
 
 == Sources
 
 === How to clone a repo to fetch sources
 
-To fetch sources, you must clone the repo to your local disk.
+To fetch sources, you  first clone the relevant repo to your local disk. Most of JBoss Tools repositories are available from https://github.com/jbosstools[jbosstools organization] on github.
+
+In the following we just use `jbosstools-base` as an example.
 
 [source,bash]
 ----
-cd ~/my-github-stuff
-git clone git@github.com:jbosstools/jbosstools-base.git
+cd ~/jbosstools
+git clone https://github.com:jbosstools/jbosstools-base
 cd jbosstools-base
 ----
 
@@ -420,6 +384,22 @@ To delete all merged branches for a given remote, you may consider adding the fo
 
 == Common Problems with Git
 
+=== Which remote to use ? http, http, ssh ?
+
+Github provides mulitple protocols for its repositories, http, https, git and git+shh. The list have grown over the years and question is which one to use ?
+
+The short answer is `https`.
+
+The longer answer is:
+
+. you can copy/paste the http url straight from the browser url (no need to fiddle with the git/ssh UI on github.com)
+. git hub uses https as default when using fork etc. so it fits nicely with that
+. it does not require ssh agent running to remember passwords and http://stackoverflow.com/questions/5343068/is-there-a-way-to-skip-password-typing-when-using-https-github[git provides credential.helper] for more portable setup.
+. it is the https://help.github.com/articles/which-remote-url-should-i-use/[recommended way from github] with the following reasons:
+.. https works everywhere even behind proxy
+.. https is available on all repos (public or private)
+.. https automatically knows if you have read, read/write based on your permissions (same setup for committers as well as contributors)
+
 === Remote git actions *always* requires username and password
 
 If your private key is encrypted with a passphrase, this will happen all the time. You can get around this by typing the following in your shell:
@@ -430,3 +410,63 @@ $ ssh-add
 ```
 
 Please see link:http://stackoverflow.com/questions/6565357/git-push-requires-username-and-password/18348125#18348125[this stackoverflow] answer for security risks when doing this, and other possible workarounds. 
+
+==== Useful aliases for ~/.gitconfig
+
+Here are some aliases you can optionally add to your `~/.gitconfig` file, in the `[alias]` section. 
+
+The first alias, `lg`, assists you in browsing the commit log. 
+After adding it to your .gitconfig file, try `git lg 5` to show the last 5 commits. 
+
+The second alias, `rb`, allows you to rebase the last `n` commits, modify commit messages, squash (combine) commits or re-order commits. 
+Try `git rb 3` to work with your last 3 commits. NOTE: This is an advanced concept and requires more knowledge of git to perform properly, but it is a handy shortcut once you know what you're doing. 
+
+[source,bash]
+----
+[alias]
+  lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %C(blue)%aE%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+  rb = "!sh -c 'git rebase -i HEAD~$1' -"
+----
+
+You can also configure default diff and merge editors. In the example below, Sublime Text is selected as the diff/merge editor, and Beyond Compare is used for performing graphical comparisons, eg., with `git difftool` or `git mergetool`.
+
+[source,bash]
+----
+[diff]
+  editor = /opt/sublimetext2/sublime_text
+  tool = bc3
+
+[merge]
+  editor = /opt/sublimetext2/sublime_text
+  tool = bc3
+----
+
+=== Useful bash scripts
+
+The following bash function will help you quickly identify when you are inside a folder
+that is recognized as a git repository.  It will customize your bash prompt to include 
+the repository name and the current branch. 
+
+[source,bash] 
+----
+# returns the branch name
+__git_ps1 ()
+{
+  local b="$(git symbolic-ref HEAD 2>/dev/null)";
+  if [ -n "$b" ]; then
+    printf " (%s)" "${b##refs/heads/}";
+  fi
+}
+export PS1='[\u@\h \W] $(__git_ps1 "(%s)")$'
+
+# this may also be required for your distro
+PROMPT_COMMAND=__git_ps1
+----
+
+Now when in a git folder, your bash prompt will look as follows:
+
+[source,bash] 
+----
+[user@localhost jbosstools-server]  (master) $
+----
+
